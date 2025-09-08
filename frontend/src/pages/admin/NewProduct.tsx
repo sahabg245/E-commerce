@@ -42,8 +42,9 @@ const NewProduct = () => {
           <input
             className="w-full p-2 border rounded"
             type="number"
-            value={price}
-            onChange={(e) => setPrice(Number(e.target.value))}
+            min="0"
+            value={price || ''}
+            onChange={(e) => setPrice(Number(e.target.value)||0)}
           />
         </div>
         <div>

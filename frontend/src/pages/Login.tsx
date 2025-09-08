@@ -15,15 +15,23 @@ const Login = () => {
     try {
       const res = await axios.post('/api/auth/login', { email, password });
 
+      console.log("Login response:", res.data); // 👈 Debugging
+
       const userData = {
-        id: res.data.user.id,
+        id: res.data.user._id || res.data.user.id, // handle both
         name: res.data.user.name,
         email: res.data.user.email,
-        role: res.data.user.role,
+        role: res.data.user.role || 'user',
         token: res.data.token,
       };
 
+      if (!userData.token) {
+        toast.error("No token received from backend!");
+        return;
+      }
+
       setUser(userData);
+      localStorage.setItem("authUser", JSON.stringify(userData)); 
       toast.success('Logged in');
       nav('/');
     } catch (err) {
@@ -37,9 +45,11 @@ const Login = () => {
       <h1 className="text-2xl mb-4">Login</h1>
       <form onSubmit={submit} className="space-y-3">
         <input
+          type="email"
           value={email}
           onChange={e => setEmail(e.target.value)}
           placeholder="Email"
+          required
           className="w-full p-2 border rounded"
         />
         <input
@@ -47,6 +57,7 @@ const Login = () => {
           value={password}
           onChange={e => setPassword(e.target.value)}
           placeholder="Password"
+          required
           className="w-full p-2 border rounded"
         />
         <div className="flex items-center justify-between">
