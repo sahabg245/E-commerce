@@ -3,48 +3,37 @@ const Product = require('../models/Product');
 const { protect, admin } = require('../middleware/auth');
 const router = express.Router();
 
-// GET all products
+// Public: get all products
 router.get('/', async (req, res) => {
   const products = await Product.find();
   res.json(products);
 });
 
-// GET single product by id
+// Public: get one product
 router.get('/:id', async (req, res) => {
-  const p = await Product.findById(req.params.id);
-  if (!p) return res.status(404).json({ message: 'Not found' });
-  res.json(p);
+  const product = await Product.findById(req.params.id);
+  if (!product) return res.status(404).json({ message: 'Product not found' });
+  res.json(product);
 });
 
-// CREATE new product (admin only)
+// Admin only: create product
 router.post('/', protect, admin, async (req, res) => {
-  const data = req.body;
-  const p = new Product(data);
-  await p.save();
-  res.status(201).json(p);
+  const product = new Product(req.body);
+  await product.save();
+  res.status(201).json(product);
 });
 
-// UPDATE product (admin only)
+// Admin only: update product
 router.put('/:id', protect, admin, async (req, res) => {
-  const { name, price, description, countInStock } = req.body;
-  const p = await Product.findById(req.params.id);
-  if (!p) return res.status(404).json({ message: 'Not found' });
-
-  p.name = name ?? p.name;
-  p.price = price ?? p.price;
-  p.description = description ?? p.description;
-  p.countInStock = countInStock ?? p.countInStock;
-
-  const updated = await p.save();
-  res.json(updated);
+  const product = await Product.findByIdAndUpdate(req.params.id, req.body, { new: true });
+  if (!product) return res.status(404).json({ message: 'Product not found' });
+  res.json(product);
 });
 
-// DELETE product (admin only)
+// Admin only: delete product
 router.delete('/:id', protect, admin, async (req, res) => {
-  const p = await Product.findById(req.params.id);
-  if (!p) return res.status(404).json({ message: 'Not found' });
-
-  await p.deleteOne();
+  const product = await Product.findByIdAndDelete(req.params.id);
+  if (!product) return res.status(404).json({ message: 'Product not found' });
   res.json({ message: 'Product removed' });
 });
 

@@ -36,55 +36,61 @@ const AdminProducts = () => {
   return (
     <div>
       <h1 className="text-2xl mb-4">Admin: Manage Products</h1>
-
-      {/* Add new product */}
+      
       <Link
         to="/admin/products/new"
         className="inline-block bg-green-600 text-white px-4 py-2 rounded mb-4"
       >
-        ➕ Add New Product
+         + Add New Product
       </Link>
 
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="p-2">Name</th>
-            <th className="p-2">Price</th>
-            <th className="p-2">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          {products.map((p) => (
-            <tr key={p._id} className="border">
-              <td className="p-2">{p.name}</td>
-              <td className="p-2">${p.price}</td>
-              <td className="p-2">
-                {/* EDIT navigates to edit page */}
-                <Link
-                  to={`/admin/products/${p._id}/edit`}
-                  className="text-blue-600 mr-3"
-                >
-                  Edit
-                </Link>
-                {/* DELETE calls API */}
-                <button
-                  onClick={() => deleteProduct(p._id)}
-                  className="text-red-600"
-                >
-                  Delete
-                </button>
-              </td>
-            </tr>
-          ))}
-          {products.length === 0 && (
-            <tr>
-              <td className="p-4 text-center text-gray-500" colSpan={3}>
-                No products yet
-              </td>
-            </tr>
-          )}
-        </tbody>
-      </table>
+     <table className="w-full border">
+  <thead>
+    <tr className="bg-gray-100">
+      <th className="p-2">Image</th>
+      <th className="p-2">Name</th>
+      <th className="p-2">Price</th>
+      <th className="p-2">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {products.map((p) => (
+      <tr key={p._id} className="border">
+        <td className="p-2">
+          <img
+            src={p.image || "/placeholder.png"}
+            alt={p.name}
+            className="h-12 w-12 object-cover rounded"
+          />
+        </td>
+        <td className="p-2">{p.name}</td>
+        <td className="p-2">${p.price}</td>
+        <td className="p-2">
+          <Link
+            to={`/admin/products/${p._id}/edit`}
+            className="text-blue-600 mr-3"
+          >
+            Edit
+          </Link>
+          <button
+            onClick={() => deleteProduct(p._id)}
+            className="text-red-600"
+          >
+            Delete
+          </button>
+        </td>
+      </tr>
+    ))}
+    {products.length === 0 && (
+      <tr>
+        <td className="p-4 text-center text-gray-500" colSpan={4}>
+          No products yet
+        </td>
+      </tr>
+    )}
+  </tbody>
+</table>
+
     </div>
   );
 };

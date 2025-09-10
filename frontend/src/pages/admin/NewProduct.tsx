@@ -9,15 +9,43 @@ const NewProduct = () => {
   const [price, setPrice] = useState<number>(0);
   const [description, setDescription] = useState('');
   const [countInStock, setCountInStock] = useState<number>(0);
+  const [image, setImage] = useState('');
+  const [uploading, setUploading] = useState(false);
+
   const user = useAuthStore((s) => s.user);
   const nav = useNavigate();
+
+  const uploadFileHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      setUploading(true);
+      const { data } = await axios.post('/api/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
+      setImage(data.image);
+      toast.success('Image uploaded');
+    } catch (err) {
+      console.error(err);
+      toast.error('Image upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
 
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await axios.post(
         '/api/products',
-        { name, price, description, countInStock },
+        { name, price, description, countInStock, image },
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
       toast.success('Product created');
@@ -39,13 +67,7 @@ const NewProduct = () => {
         </div>
         <div>
           <label className="block mb-1 font-medium">Price</label>
-          <input
-            className="w-full p-2 border rounded"
-            type="number"
-            min="0"
-            value={price || ''}
-            onChange={(e) => setPrice(Number(e.target.value)||0)}
-          />
+          <input type="number" className="w-full p-2 border rounded" value={price} onChange={(e) => setPrice(Number(e.target.value))} />
         </div>
         <div>
           <label className="block mb-1 font-medium">Description</label>
@@ -53,12 +75,13 @@ const NewProduct = () => {
         </div>
         <div>
           <label className="block mb-1 font-medium">Stock</label>
-          <input
-            className="w-full p-2 border rounded"
-            type="number"
-            value={countInStock}
-            onChange={(e) => setCountInStock(Number(e.target.value))}
-          />
+          <input type="number" className="w-full p-2 border rounded" value={countInStock} onChange={(e) => setCountInStock(Number(e.target.value))} />
+        </div>
+        <div>
+          <label className="block mb-1 font-medium">Image</label>
+          <input type="file" onChange={uploadFileHandler} />
+          {uploading && <p className="text-sm text-gray-500">Uploading...</p>}
+          {image && <img src={image} alt="preview" className="mt-2 h-32 object-cover" />}
         </div>
         <button className="bg-green-600 text-white px-4 py-2 rounded">Save</button>
       </form>

@@ -10,6 +10,9 @@ const EditProduct = () => {
   const [price, setPrice] = useState<number>(0);
   const [description, setDescription] = useState('');
   const [countInStock, setCountInStock] = useState<number>(0);
+  const [image, setImage] = useState('');
+  const [uploading, setUploading] = useState(false);
+
   const user = useAuthStore((s) => s.user);
   const nav = useNavigate();
 
@@ -23,6 +26,7 @@ const EditProduct = () => {
         setPrice(p.price);
         setDescription(p.description);
         setCountInStock(p.countInStock);
+        setImage(p.image);
       })
       .catch((err) => {
         console.error(err);
@@ -30,12 +34,36 @@ const EditProduct = () => {
       });
   }, [id]);
 
+  const uploadFileHandler = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('image', file);
+
+    try {
+      setUploading(true);
+      const { data } = await axios.post('/api/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${user?.token}`,
+        },
+      });
+      setImage(data.image); // ✅ update image
+      toast.success('Image uploaded');
+    } catch (err) {
+      console.error(err);
+      toast.error('Image upload failed');
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const submit = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await axios.put(
         `/api/products/${id}`,
-        { name, price, description, countInStock },
+        { name, price, description, countInStock, image },
         { headers: { Authorization: `Bearer ${user?.token}` } }
       );
       toast.success('Product updated');
@@ -77,6 +105,15 @@ const EditProduct = () => {
             onChange={(e) => setCountInStock(Number(e.target.value))}
           />
         </div>
+
+        {/* ✅ Image Upload */}
+        <div>
+          <label className="block mb-1 font-medium">Product Image</label>
+          <input type="file" onChange={uploadFileHandler} />
+          {uploading && <p>Uploading...</p>}
+          {image && <img src={image} alt="preview" className="w-32 mt-2 rounded" />}
+        </div>
+
         <button className="bg-blue-600 text-white px-4 py-2 rounded">Update</button>
       </form>
     </div>
