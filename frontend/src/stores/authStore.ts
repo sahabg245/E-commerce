@@ -35,12 +35,18 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     set({ user: u });
   },
   logout: () => set({ user: null }),
-  checkToken: () => {
-    const user = get().user;
-    if (user?.token) {
-      const decoded: JwtPayload = jwtDecode(user.token);
-      const now = Date.now() / 1000;
-      if (decoded.exp < now) {
+   checkToken: () => {
+    const data = JSON.parse(localStorage.getItem("auth-storage") || "null");
+    if (data?.state?.user?.token) {
+      try {
+        const decoded: any = jwtDecode(data.state.user.token);
+        if (decoded.exp * 1000 < Date.now()) {
+          localStorage.removeItem("auth-storage");
+          set({ user: null });
+        } else {
+          set({ user: data.state.user });
+        }
+      } catch {
         set({ user: null });
       }
     }

@@ -35,7 +35,6 @@ const Products = () => {
             key={p._id} 
             className="border p-4 rounded shadow-sm flex flex-col justify-between h-80 bg-white"
           >
-            {/* Product Image */}
             {p.image && (
               <img
                 src={p.image || "/placeholder.png"}
@@ -44,7 +43,6 @@ const Products = () => {
               />
             )}
 
-            {/* Product Name */}
             <Link 
               to={`/products/${p._id}`} 
               className="font-bold text-lg block truncate"
@@ -52,12 +50,10 @@ const Products = () => {
               {p.name}
             </Link>
 
-            {/* Description */}
             <p className="text-sm text-gray-600 line-clamp-2">
               {p.description}
             </p>
 
-            {/* Price + Add to Cart */}
             <div className="mt-2 flex items-center justify-between">
               <div className="text-xl font-semibold">${p.price.toFixed(2)}</div>
               <button 

@@ -7,12 +7,17 @@ import toast from "react-hot-toast";
 
 const Checkout = () => {
   const items = useCartStore((s) => s.items);
-  const subtotal = useCartStore((s) => s.subtotal); 
+  const subtotal = useCartStore((s) => s.subtotal);
   const clear = useCartStore((s) => s.clear);
   const user = useAuthStore((s) => s.user);
   const navigate = useNavigate();
 
   const placeOrder = async () => {
+    if (!user?.token) {
+      toast.error("You must be logged in to place an order");
+      return;
+    }
+
     try {
       const orderItems = items.map((i) => ({
         product: i._id,
@@ -24,12 +29,12 @@ const Checkout = () => {
       await axios.post(
         "/api/orders",
         { items: orderItems, totalPrice: subtotal },
-        { headers: { Authorization: `Bearer ${user?.token}` } }
+        { headers: { Authorization: `Bearer ${user.token}` } }
       );
 
       toast.success("Order placed successfully");
-      clear(); 
-      navigate("/my-orders"); 
+      clear();
+      navigate("/my-orders");
     } catch (err: any) {
       console.error(err.response?.data || err);
       toast.error(err.response?.data?.message || "Failed to place order");
@@ -57,7 +62,7 @@ const Checkout = () => {
             ))}
           </ul>
           <div className="mt-4 font-bold text-lg">
-              Subtotal: ${(subtotal || 0).toFixed(2)}
+            Subtotal: ${(subtotal || 0).toFixed(2)}
           </div>
 
           <button
