@@ -41,7 +41,7 @@ const Navbar = () => {
 
               {user?.role === "admin" && (
                 <div className="relative group">
-                  <button className="text-red-600 font-bold">Admin ▾</button>
+                  <button className="text-red-500 font-bold">Admin ▾</button>
                   <div className="absolute hidden group-hover:block bg-white shadow rounded mt-2 z-50 min-w-[180px]">
                     <Link
                       to="/admin/products"

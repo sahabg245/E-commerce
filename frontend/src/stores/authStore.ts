@@ -1,5 +1,5 @@
-import create from "zustand";
-import {jwtDecode} from "jwt-decode";
+import { create } from "zustand";
+import { jwtDecode } from "jwt-decode";
 
 type User = {
   id: string;
@@ -11,6 +11,7 @@ type User = {
 
 type AuthState = {
   user: User;
+  login: (u: Exclude<User, null>) => void;
   setUser: (u: User) => void;
   logout: () => void;
   checkToken: () => void;
@@ -20,13 +21,28 @@ type JwtPayload = {
   exp: number;
 };
 
-export const useAuthStore = create<AuthState>((set, get) => ({
+export const useAuthStore = create<AuthState>((set) => ({
   user: null,
+
+  login: (u) => {
+    if (u?.token) {
+      const decoded: JwtPayload = jwtDecode(u.token);
+      const now = Date.now() / 1000;
+      if (decoded.exp < now) {
+        set({ user: null });
+        localStorage.removeItem("auth-storage");
+        return;
+      }
+    }
+
+    set({ user: u });
+    localStorage.setItem("auth-storage", JSON.stringify({ state: { user: u } }));
+  },
+
   setUser: (u) => {
     if (u?.token) {
       const decoded: JwtPayload = jwtDecode(u.token);
       const now = Date.now() / 1000;
-
       if (decoded.exp < now) {
         set({ user: null });
         return;
@@ -34,8 +50,13 @@ export const useAuthStore = create<AuthState>((set, get) => ({
     }
     set({ user: u });
   },
-  logout: () => set({ user: null }),
-   checkToken: () => {
+
+  logout: () => {
+    set({ user: null });
+    localStorage.removeItem("auth-storage");
+  },
+
+  checkToken: () => {
     const data = JSON.parse(localStorage.getItem("auth-storage") || "null");
     if (data?.state?.user?.token) {
       try {
