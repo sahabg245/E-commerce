@@ -48,7 +48,7 @@ const EditProduct = () => {
           Authorization: `Bearer ${user?.token}`,
         },
       });
-      setImage(data.image); // ✅ update image
+      setImage(data.image);
       toast.success('Image uploaded');
     } catch (err) {
       console.error(err);
@@ -106,7 +106,6 @@ const EditProduct = () => {
           />
         </div>
 
-        {/* ✅ Image Upload */}
         <div>
           <label className="block mb-1 font-medium">Product Image</label>
           <input type="file" onChange={uploadFileHandler} />

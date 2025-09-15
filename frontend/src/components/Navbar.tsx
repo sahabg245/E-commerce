@@ -4,7 +4,7 @@ import { useCartStore } from "../stores/cartStore";
 import { useAuthStore } from "../stores/authStore";
 
 const Navbar = () => {
-  const cartCount = useCartStore((state) => state.totalItems());
+  const cartCount = useCartStore((state) => state.totalItems);
   const clearCart = useCartStore((state) => state.clear);
   const user = useAuthStore((state) => state.user);
   const logout = useAuthStore((state) => state.logout);
@@ -58,6 +58,10 @@ const Navbar = () => {
                   </div>
                 </div>
               )}
+
+              <Link to="/my-orders" className="text-sm underline">
+                My Orders
+              </Link>
 
               <button
                 onClick={handleLogout}
