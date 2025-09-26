@@ -14,7 +14,7 @@ const Home = () => {
   useEffect(() => {
     const interval = setInterval(() => {
       nextSlide();
-    }, 5000);
+    }, 3000);
     return () => clearInterval(interval);
   }, []);
 
@@ -86,7 +86,6 @@ const Home = () => {
         </div>
       </section>
 
-      {/* Featured Products */}
       <section>
         <h2 className="text-2xl font-bold mb-4">Top Deals</h2>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

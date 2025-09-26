@@ -7,12 +7,12 @@ type User = {
   email: string;
   role?: string;
   token: string;
-} | null;
+};
 
 type AuthState = {
-  user: User;
-  login: (u: Exclude<User, null>) => void;
-  setUser: (u: User) => void;
+  user: User | null;
+  login: (data: { user: Omit<User, "token">; token: string }) => void;
+  setUser: (u: User | null) => void;
   logout: () => void;
   checkToken: () => void;
 };
@@ -24,7 +24,9 @@ type JwtPayload = {
 export const useAuthStore = create<AuthState>((set) => ({
   user: null,
 
-  login: (u) => {
+  login: (data) => {
+    const u: User = { ...data.user, token: data.token };
+
     if (u?.token) {
       const decoded: JwtPayload = jwtDecode(u.token);
       const now = Date.now() / 1000;

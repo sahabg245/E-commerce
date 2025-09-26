@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { createRoot } from "react-dom/client";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from "react-router-dom";
 import "./styles/index.css";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
@@ -18,6 +18,93 @@ import EditProduct from "./pages/admin/EditProducts";
 import Checkout from "./pages/Checkout";
 import MyOrders from "./pages/Myorder";
 import { useAuthStore } from "./stores/authStore";
+import ProtectedRoute from "../src/components/ProtectedRoutes";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import AdminRoute from "./pages/admin/AdminRoute";
+
+const AppLayout = () => {
+  const location = useLocation();
+  const hideNavbar = ["/login", "/register"].includes(location.pathname);
+
+  return (
+    <div className="min-h-screen flex flex-col">
+      {!hideNavbar && <Navbar />}
+      <main className="flex-1 container mx-auto px-4 py-6">
+        <Routes>
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products"
+            element={
+              <ProtectedRoute>
+                <Products />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/products/:id"
+            element={
+              <ProtectedRoute>
+                <ProductDetails />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/cart"
+            element={
+              <ProtectedRoute>
+                <Cart />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/checkout"
+            element={
+              <ProtectedRoute>
+                <Checkout />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/my-orders"
+            element={
+              <ProtectedRoute>
+                <MyOrders />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/admin"
+            element={
+              <AdminRoute>
+                <AdminDashboard />
+              </AdminRoute>
+            }
+          >
+            <Route index element={<Navigate to="dashboard" replace />} />
+            <Route path="dashboard" element={<h2>Welcome to Admin Dashboard</h2>} />
+            <Route path="products" element={<AdminProducts />} />
+            <Route path="orders" element={<AdminOrders />} />
+            <Route path="products/new" element={<NewProduct />} />
+            <Route path="products/:id/edit" element={<EditProduct />} />
+          </Route>
+        </Routes>
+      </main>
+      {!hideNavbar && <Footer />}
+      <Toaster />
+    </div>
+  );
+};
 
 const App = () => {
   const checkToken = useAuthStore((s) => s.checkToken);
@@ -28,29 +115,7 @@ const App = () => {
 
   return (
     <BrowserRouter>
-      <div className="min-h-screen flex flex-col">
-        <Navbar />
-        <main className="flex-1 container mx-auto px-4 py-6">
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/products" element={<Products />} />
-            <Route path="/products/:id" element={<ProductDetails />} />
-            <Route path="/cart" element={<Cart />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/register" element={<Register />} />
-
-            <Route path="/admin/products" element={<AdminProducts />} />
-            <Route path="/admin/orders" element={<AdminOrders />} />
-            <Route path="/admin/products/new" element={<NewProduct />} />
-            <Route path="/admin/products/:id/edit" element={<EditProduct />} />
-
-            <Route path="/checkout" element={<Checkout />} />
-            <Route path="/my-orders" element={<MyOrders />} />
-          </Routes>
-        </main>
-        <Footer />
-        <Toaster />
-      </div>
+      <AppLayout />
     </BrowserRouter>
   );
 };

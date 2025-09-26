@@ -28,7 +28,7 @@ router.put('/:id', protect, admin, async (req, res) => {
 
 router.delete('/:id', protect, admin, async (req, res) => {
   const product = await Product.findByIdAndDelete(req.params.id);
-  if (!product) return res.status(404).json({ message: 'Product not found' });
+  if (!product) return res.status(404).json({ message: 'Product not found'});
   res.json({ message: 'Product removed' });
 });
 

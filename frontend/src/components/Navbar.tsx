@@ -1,88 +1,77 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { useCartStore } from "../stores/cartStore";
+import { Link } from "react-router-dom";
 import { useAuthStore } from "../stores/authStore";
 
 const Navbar = () => {
-  const cartCount = useCartStore((state) => state.totalItems);
-  const clearCart = useCartStore((state) => state.clear);
-  const user = useAuthStore((state) => state.user);
-  const logout = useAuthStore((state) => state.logout);
-  const navigate = useNavigate();
-
-  const handleLogout = () => {
-    logout();
-    clearCart();
-    navigate("/");
-  };
+  const user = useAuthStore((s) => s.user);
+  const logout = useAuthStore((s) => s.logout);
 
   return (
-    <header className="bg-yellow-400">
-      <div className="container mx-auto px-4 py-3 flex items-center gap-4">
-        <Link to="/" className="text-2xl font-extrabold">
-          MyAmazon
-        </Link>
+    <nav className="bg-yellow-400 shadow-md px-6 py-3 flex justify-between items-center">
+      <Link
+        to="/"
+        className="font-bold text-2xl text-gray-800 hover:text-black transition-colors duration-200"
+      >
+        🛒 E-Commerce
+      </Link>
 
-        <div className="flex-1">
-          <input
-            type="text"
-            placeholder="Search products..."
-            className="w-full max-w-2xl p-2 rounded"
-            onKeyDown={(e) => {
-              if (e.key === "Enter") navigate("/products");
-            }}
-          />
-        </div>
+      <div className="flex gap-6 items-center">
+        {user && user.role !== "admin" && (
+          <>
+            <Link
+              to="/products"
+              className="text-lg font-medium text-gray-700 hover:text-black hover:underline transition-colors"
+            >
+              Products
+            </Link>
+            <Link
+              to="/cart"
+              className="text-lg font-medium text-gray-700 hover:text-black hover:underline transition-colors"
+            >
+              Cart
+            </Link>
+            <Link
+              to="/my-orders"
+              className="text-lg font-medium text-gray-700 hover:text-black hover:underline transition-colors"
+            >
+              My Orders
+            </Link>
+          </>
+        )}
 
-        <nav className="flex items-center gap-4">
-          {user ? (
-            <>
-              <span>Hi, {user.name}</span>
-
-              {user?.role === "admin" && (
-                <div className="relative group">
-                  <button className="text-red-500 font-bold">Admin ▾</button>
-                  <div className="absolute hidden group-hover:block bg-white shadow rounded mt-2 z-50 min-w-[180px]">
-                    <Link
-                      to="/admin/products"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Manage Products
-                    </Link>
-                    <Link
-                      to="/admin/orders"
-                      className="block px-4 py-2 hover:bg-gray-100"
-                    >
-                      Manage Orders
-                    </Link>
-                  </div>
-                </div>
-              )}
-
-              <Link to="/my-orders" className="text-sm underline">
-                My Orders
-              </Link>
-
-              <button
-                onClick={handleLogout}
-                className="ml-4 text-sm text-gray-700 underline"
-              >
-                Logout
-              </button>
-            </>
-          ) : (
-            <Link to="/login">Sign in</Link>
-          )}
-
-          <Link to="/cart" className="relative">
-            Cart{" "}
-            <span className="ml-2 bg-black text-white rounded-full px-2 text-sm">
-              {cartCount}
-            </span>
+        {user && user.role === "admin" && (
+          <Link
+            to="/admin/dashboard"
+            className="text-lg font-semibold text-red-600 hover:text-red-800 hover:underline transition-colors"
+          >
+            Admin Dashboard
           </Link>
-        </nav>
+        )}
+
+        {!user ? (
+          <>
+            <Link
+              to="/login"
+              className="px-4 py-2 rounded-lg bg-white text-yellow-600 font-medium hover:bg-yellow-500 hover:text-white transition"
+            >
+              Login
+            </Link>
+            <Link
+              to="/register"
+              className="px-4 py-2 rounded-lg bg-yellow-600 text-white font-medium hover:bg-yellow-700 transition"
+            >
+              Register
+            </Link>
+          </>
+        ) : (
+          <button
+            onClick={logout}
+            className="px-4 py-2 rounded-lg bg-red-500 text-white font-medium hover:bg-red-600 transition"
+          >
+            Logout
+          </button>
+        )}
       </div>
-    </header>
+    </nav>
   );
 };
 

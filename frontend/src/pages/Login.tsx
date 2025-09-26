@@ -3,10 +3,12 @@ import { Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 import toast from "react-hot-toast";
 import { useAuthStore } from "../stores/authStore";
+import { Eye, EyeOff } from "lucide-react";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const login = useAuthStore((s) => s.login);
@@ -27,19 +29,21 @@ const Login = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-yellow-100 via-white to-yellow-50">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-yellow-100 to-yellow-200">
       <div className="w-full max-w-md p-8 bg-white rounded-2xl shadow-lg">
-        <h1 className="text-3xl font-extrabold text-center text-gray-800 mb-6">
-          Sign in to <span className="text-yellow-500">MyAmazon</span>
+        <h1 className="text-3xl font-bold text-center text-gray-800 mb-6">
+          Welcome Back
         </h1>
 
         <form onSubmit={submit} className="space-y-5">
           <div>
-            <label className="block mb-1 font-medium text-gray-700">Email</label>
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              Email
+            </label>
             <input
               type="email"
-              placeholder="Enter your email"
-              className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+              placeholder="you@example.com"
+              className="w-full border rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-yellow-400"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -47,21 +51,32 @@ const Login = () => {
           </div>
 
           <div>
-            <label className="block mb-1 font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              className="w-full border rounded-lg p-3 focus:outline-none focus:ring-2 focus:ring-yellow-400"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              required
-            />
+            <label className="block mb-1 text-sm font-medium text-gray-700">
+              Password
+            </label>
+            <div className="relative">
+              <input
+                type={showPassword ? "text" : "password"}
+                placeholder="••••••••"
+                className="w-full border rounded-lg px-4 py-2 pr-10 focus:outline-none focus:ring-2 focus:ring-yellow-400"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute inset-y-0 right-3 flex items-center text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full py-3 rounded-lg font-semibold text-white bg-yellow-500 hover:bg-yellow-600 transition-all disabled:opacity-70"
+            className="w-full py-2 rounded-lg font-semibold text-gray-900 bg-yellow-400 hover:bg-yellow-500 transition-all disabled:opacity-70"
           >
             {loading ? "Signing in..." : "Sign In"}
           </button>
@@ -84,7 +99,8 @@ const Login = () => {
           and{" "}
           <span className="text-blue-600 hover:underline cursor-pointer">
             Privacy Policy
-          </span>.
+          </span>
+          .
         </div>
       </div>
     </div>
